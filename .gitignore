@@ -8,8 +8,16 @@ Desktop.ini
 # ============================================
 # Environment & Secrets (DO NOT COMMIT)
 # ============================================
+.env
+.env.local
+.env.*.local
+luffy_api/.env
+docker_compose_files/mysql.env
+docker_compose_files/*.env
+!docker_compose_files/*.env.example
 
 # Private keys and certificates
+*.pem
 *.key
 *.crt
 *.p12
@@ -100,9 +108,10 @@ ai_rule.md
 内网穿透与支付宝回调调试指南.md
 luffycity/luffy前端优化建议清单.md
 luffy_api/luffy_api/apps/order/management/commands/test_alipay.py
-.claude/
+.claude/settings.json
 luffy_api/luffy_api/media/icon/
 
 # Project config & dev docs (personal use, not for repo)
 CLAUDE.md
 luffy_api/docs/
+
