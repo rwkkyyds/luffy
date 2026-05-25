@@ -1,0 +1,78 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx
+    container_name: luffy_nginx
+    ports:
+      - "80:80"
+    restart: always
+    volumes:
+      - ./luffycity/dist:/var/www/html
+      - ./luffy_api/luffy_api/staticfiles:/var/www/static
+      - ./docker_compose_files/nginx:/etc/nginx/conf.d
+    depends_on:
+      - django
+    networks:
+      - web
+
+  django:
+    build:
+      context: ./luffy_api
+      dockerfile: Dockerfile
+    container_name: luffy_django
+    command: >
+      sh -c "python manage_pro.py makemigrations --noinput &&
+             python manage_pro.py migrate --noinput &&
+             uwsgi --ini /soft/uwsgi.ini"
+    restart: always
+    volumes:
+      - ./luffy_api:/soft
+    environment:
+      - TZ=Asia/Shanghai
+    env_file:
+      - ./luffy_api/.env
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - web
+
+  redis:
+    image: redis:8.4.0
+    container_name: luffy_redis
+    volumes:
+      - ./docker_compose_files/redis/data:/data
+      - ./docker_compose_files/redis/redis.conf:/etc/redis/redis.conf
+    command: redis-server /etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - web
+
+  mysql:
+    image: mysql:8.0
+    container_name: luffy_mysql
+    restart: always
+    env_file:
+      - ./docker_compose_files/mysql.env
+    volumes:
+      - ./docker_compose_files/mysql/data:/var/lib/mysql
+      - ./docker_compose_files/mysql/logs:/var/log/mysql
+      - ./docker_compose_files/mysql/conf:/etc/mysql/conf.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - web
+
+networks:
+  web:

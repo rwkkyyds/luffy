@@ -1,0 +1,116 @@
+# ============================================
+# OS / System
+# ============================================
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ============================================
+# Environment & Secrets (DO NOT COMMIT)
+# ============================================
+.env
+.env.local
+.env.*.local
+luffy_api/.env
+docker_compose_files/mysql.env
+docker_compose_files/*.env
+!docker_compose_files/*.env.example
+
+# Private keys and certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# ============================================
+# Python
+# ============================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+*.sage.py
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Django
+*.log
+luffy_api/logs/
+luffy_api/media/uploads/
+
+# RAG generated data (built by scripts/build_course_vectors.py)
+luffy_api/data/course_vectors.json
+luffy_api/data/course_vectors.index
+
+# uWSGI binary
+
+# ============================================
+# Node / Frontend
+# ============================================
+luffycity/node_modules/
+luffycity/dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ============================================
+# Docker runtime data (volumes)
+# ============================================
+docker_compose_files/mysql/data/
+docker_compose_files/redis/data/
+
+# ============================================
+# IDE / Editor
+# ============================================
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ============================================
+# Project-specific (interview prep docs, not code)
+# ============================================
+luffy_项目面试拷打指南.md
+hr对象拷打环节.md
+项目拷打记录.md
+面试准备手册.md
+面试准备手册_v2.md
+luffy待优化建议.md
+luffy待优化的记录.md
+luffy接口开发清单.md
+小米MiMo_100T申请指南.md
+ai_guize.md
+ai_rule.md
+内网穿透与支付宝回调调试指南.md
+luffycity/luffy前端优化建议清单.md
+luffy_api/luffy_api/apps/order/management/commands/test_alipay.py
+.claude/
+luffy_api/luffy_api/media/icon/
+
+# Project config & dev docs (personal use, not for repo)
+CLAUDE.md
+luffy_api/docs/
