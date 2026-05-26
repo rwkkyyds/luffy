@@ -142,7 +142,24 @@ docker cp luffy_api/luffy.sql luffy_django:/tmp/
 docker exec -i luffy_django mysql -h luffy_mysql -u luffy -p<密码> luffy < /tmp/luffy.sql
 ```
 
-### 第 7 步：访问
+### 第 7 步：构建 AI 课程向量索引
+
+AI 问答功能依赖离线构建的向量索引。导入课程数据后，在 Django 容器内执行：
+
+```bash
+# 确认 ZHIPU_API_KEY 已在 .env 中配置
+docker exec -i luffy_django python scripts/build_course_vectors.py
+```
+
+该脚本会遍历所有已上架课程（`status=0`）：
+- 每门课的**概述**生成一条向量
+- 每个**课时**生成一条向量（精确到章节 → 课时名）
+- 调用智谱 embedding-2 API 生成向量，存入 FAISS 索引
+- 产出文件：`luffy_api/data/course_vectors.json` + `luffy_api/data/course_vectors.index`
+
+> 索引文件已在 `.gitignore` 中排除，不会被提交到 Git。每次新增/修改课程后重新运行一次即可。
+
+### 第 8 步：访问
 
 - 前端首页：`http://<你的服务器IP>`
 - 后台管理：`http://<你的服务器IP>/admin/`
@@ -207,6 +224,9 @@ docker-compose down -v
 │   ├── manage.py                         # 开发 manage.py
 │   ├── manage_pro.py                     # 生产 manage.py
 │   ├── logs/                             # uWSGI + Django 日志
+│   ├── data/                             # RAG 向量索引文件
+│   │   ├── course_vectors.json           # 向量数据（gitignore）
+│   │   └── course_vectors.index          # FAISS 索引（gitignore）
 │   └── luffy_api/
 │       ├── setting/
 │       │   ├── dev.py                    # 开发配置
@@ -278,7 +298,9 @@ sudo chown -R 999:999 docker_compose_files/mysql/data
 `user_settings.py` 的 `BACKEND_BASE_URL` 需为公网可访问地址（内网穿透用 ngrok）。
 
 **Q：AI 问答不工作 / 返回 503**
-检查 `.env` 的 `ZHIPU_API_KEY` 是否已配置且有效。
+1. 检查 `.env` 的 `ZHIPU_API_KEY` 是否已配置且有效。
+2. 确认已执行第 7 步构建向量索引（`luffy_api/data/course_vectors.json` 和 `.index` 存在）。
+3. 如果仅没有索引文件，AI 仍可对话但无法检索课程内容。
 
 **Q：Django 容器显示 unhealthy**
 Dockerfile HEALTHCHECK 访问 `/health/` 路径不存在（始终 400），不影响业务功能。

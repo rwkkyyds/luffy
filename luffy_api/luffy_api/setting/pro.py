@@ -29,7 +29,7 @@ COURSE_VECTOR_FILE = _course_vec_env or os.path.join(
 DEBUG = False
 
 # 服务端地址 ，* 表示任意地址都可以
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'www.luffycity.com,192.168.10.136,localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'www.luffycity.com').split(',')
 
 INSTALLED_APPS = [
     'simpleui',
@@ -60,7 +60,6 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'utils.csrf_middleware.ApiCsrfExemptMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -212,10 +211,6 @@ LOGGING = {
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'utils.exception.common_exception_handler',  # 再出异常，会执行这个函数
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'utils.authentication.BlacklistJWTAuthentication',
-    ],
 }
 
 # 把扩写了auth的user表注册一下
@@ -224,6 +219,9 @@ AUTH_USER_MODEL = 'user.user'
 # 配置media文件夹
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# 上传文件大小限制（nginx 需同步调整 client_max_body_size）
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024  # 5MB
 
 # 跨域问题处理
 # 允许简单请求，所有地址 相当于CORS_ORIGIN_ALLOW_ALL="*"
@@ -301,10 +299,3 @@ CACHES = {
         }
     },
 }
-# 静态文件（Admin 用）
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# 媒体文件（用户上传）
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
